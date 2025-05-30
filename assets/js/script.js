@@ -9,7 +9,7 @@ const info = async (link) => {
       throw new Error("Algo anduvo mal");
     }
 
-    const data = res.json();
+    const data = await res.json();
     return data;
   } catch (error) {
     console.log("Eror", error);
@@ -33,23 +33,27 @@ const verMas = async (id) => {
 }
 
 butBuscador.addEventListener("click", async () => {
+  informacion.innerHTML = ""; // Limpia contenido anterior
+
   const personajes = await info(url);
   const dataPersonaje = personajes.items;
 
-  console.log(dataPersonaje);
-
   dataPersonaje.forEach((personaje) => {
-    informacion.innerHTML += `
-    <div class="col-3" data-id=${personaje.id}>
-                <img
-                class="card-img-top"
-                src=${personaje.image}
-                />
-                <h2>${personaje.name}</h2>
-                <p>${personaje.race} / ${personaje.gander}</p>
-                <button class="btn-ver-mas">Ver Mas</button>   
-                </div>
-        `;
+    const col = document.createElement("div");
+    col.className = "col-12 col-sm-6 col-md-4 col-lg-3";
+
+    col.innerHTML = `
+      <div class="card">
+        <img src="${personaje.image}" class="card-img-top" alt="${personaje.name}">
+        <div class="card-body">
+          <h5 class="card-title">${personaje.name}</h5>
+          <p class="card-text">${personaje.race} / ${personaje.gender}</p>
+          <button class="btn btn-primary btn-ver-mas">Ver Más</button>
+        </div>
+      </div>
+    `;
+
+    informacion.appendChild(col);
   });
 });
 
