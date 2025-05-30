@@ -16,18 +16,19 @@ const info = async (link) => {
   }
 };
 
-const verMas = async () => {
+const verMas = async (id) => {
   try {
     const res = await fetch(`${url}/${id}`);
+
     if (!res.ok) {
-      throw new Error("Algo anduvo mal");
+      throw new Error("Algo no anduvo");
     }
 
-    const data = res.json();
-    
-    alert(data.description)
+    const data = await res.json();
+
+    alert(data.description);
   } catch (error) {
-    console.log("Eror", error);
+    console.log("Error ", error);
   }
 }
 
@@ -39,8 +40,11 @@ butBuscador.addEventListener("click", async () => {
 
   dataPersonaje.forEach((personaje) => {
     informacion.innerHTML += `
-    <div>
-                <img src=${personaje.image}/>
+    <div class="col-3" data-id=${personaje.id}>
+                <img
+                class="card-img-top"
+                src=${personaje.image}
+                />
                 <h2>${personaje.name}</h2>
                 <p>${personaje.race} / ${personaje.gander}</p>
                 <button class="btn-ver-mas">Ver Mas</button>   
@@ -50,6 +54,12 @@ butBuscador.addEventListener("click", async () => {
 });
 
 informacion.addEventListener("click", (e)=>{
-if (e.target.classList.contains(btn-ver-mas))
+  if (e.target.classList.contains("btn-ver-mas")){
+  const cardPadre = e.target.closest(".col-3");
+  const id = cardPadre.dataset.id;
+
+  verMas(id)
+}
+
 
 })
