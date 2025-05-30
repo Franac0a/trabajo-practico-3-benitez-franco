@@ -1,12 +1,12 @@
 const informacion = document.getElementById("contenedor-dbz");
-const butBuscador = document.getElementById("buscador-datos");
-const link = "https://dragonball-api.com/api/characters";
+const butBuscador = document.getElementById("butBuscador");
+const url = "https://dragonball-api.com/api/characters";
 
 const info = async (link) => {
   try {
     const res = await fetch(link);
     if (!res.ok) {
-      return new Error("Algo anduvo mal");
+      throw new Error("Algo anduvo mal");
     }
 
     const data = res.json();
@@ -16,27 +16,40 @@ const info = async (link) => {
   }
 };
 
+const verMas = async () => {
+  try {
+    const res = await fetch(`${url}/${id}`);
+    if (!res.ok) {
+      throw new Error("Algo anduvo mal");
+    }
+
+    const data = res.json();
+    
+    alert(data.description)
+  } catch (error) {
+    console.log("Eror", error);
+  }
+}
+
 butBuscador.addEventListener("click", async () => {
-  const personajes = await informacion(link);
+  const personajes = await info(url);
   const dataPersonaje = personajes.items;
 
-  console.log(personaje);
+  console.log(dataPersonaje);
 
-  dataPersonaje.forEach((personajes) => {
+  dataPersonaje.forEach((personaje) => {
     informacion.innerHTML += `
-      <div class="col-3 pb-2 d-flex justify-content-center" data-id=${personaje.id}>
-            <div class="card">
-              <img
-                class="card-img-top"
-                src=${personaje.image}
-              />
-              <div class="card-body">
-                <h5 class="card-title">${personaje.name}</h5>
-                <p class="card-text">${personaje.race} - ${personaje.gender}</p>
-                <button class="btn btn-success btn-ver-detalles">Ver más</button>
-              </div>
-            </div>
-          </div>
+    <div>
+                <img src=${personaje.image}/>
+                <h2>${personaje.name}</h2>
+                <p>${personaje.race} / ${personaje.gander}</p>
+                <button class="btn-ver-mas">Ver Mas</button>   
+                </div>
         `;
   });
 });
+
+informacion.addEventListener("click", (e)=>{
+if (e.target.classList.contains(btn-ver-mas))
+
+})
