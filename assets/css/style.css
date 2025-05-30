@@ -1,7 +1,48 @@
+/* Fondo general */
 body {
-  background-color: #000000;
+  background: linear-gradient(to bottom, #000000, #1a1a1a);
+  color: #f2f2f2;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* Título principal */
+h1 {
+  font-family: 'Impact', sans-serif;
+  color: #ffcc00;
+  text-shadow: 2px 2px #ff6600;
+}
+
+/* Input y botón de búsqueda */
+.input-group input {
+  border: 2px solid #ff6600;
+  background-color: #ffffff;
+  color: #fff;
+}
+.input-group input::placeholder {
+  color: #999;
+}
+.input-group .btn-primary {
+  background-color: #ff6600;
+  border: none;
+  font-weight: bold;
+}
+.input-group .btn-primary:hover {
+  background-color: #ff3300;
+}
+
+/* Tarjetas */
+.card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border: 2px solid #ffcc00;
+  background: #0d0d0d;
+  box-shadow: 0 0 10px #ff9900;
+  transition: transform 0.2s;
+}
+.card:hover {
+  transform: scale(1.03);
+}
 .card-img-top {
   width: 100%;
   height: 300px;
@@ -10,20 +51,46 @@ body {
   padding: 1rem;
 }
 
-.card {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
+/* Texto en tarjeta */
+.card-title {
+  color: #ffcc00;
+  font-weight: bold;
+}
+.card-text {
+  color: #ffffff;
 }
 
-.card-body {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+/* Botón Ver más */
+.btn-ver-mas {
+  background-color: #0066cc;
+  color: white;
+  border: none;
+}
+.btn-ver-mas:hover {
+  background-color: #004d99;
 }
 
+/* Modal */
+.modal-content {
+  background-color: #1a1a1a;
+  border: 2px solid #ffcc00;
+  color: #fff;
+}
+.modal-title {
+  color: #ffcc00;
+  font-weight: bold;
+}
 .modal-body img {
   max-width: 100%;
   height: auto;
   margin-bottom: 1rem;
+  border: 3px solid #ff6600;
+  border-radius: 8px;
+}
+
+.card,
+.card-body,
+.card-title,
+.card-text {
+  color: #fff !important;
 }

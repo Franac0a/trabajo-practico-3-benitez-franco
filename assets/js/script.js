@@ -1,33 +1,31 @@
 const informacion = document.getElementById("contenedor-dbz");
-const butBuscador = document.getElementById("butBuscador");
 const inputBuscador = document.getElementById("inputBuscador");
-const urlBase = "https://dragonball-api.com/api/characters";
+const butBuscador = document.getElementById("butBuscador");
 
+const urlBase = "https://dragonball-api.com/api/characters";
 const modal = new bootstrap.Modal(document.getElementById("modalDetalle"));
 const modalContenido = document.getElementById("modalContenido");
 
+let currentPage = 1;
+let isLoading = false;
+let hasMore = true;
+let isSearching = false;
+
 // Función para traer datos desde la API
-const info = async (link) => {
+const fetchData = async (url) => {
   try {
-    const res = await fetch(link);
-    if (!res.ok) throw new Error("Algo anduvo mal");
-    const data = await res.json();
-    return data;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("Error al conectar con la API");
+    return await res.json();
   } catch (error) {
-    console.log("Error", error);
-    informacion.innerHTML = `<p class="text-danger">Error al conectar con la API.</p>`;
+    console.error(error);
+    return null;
   }
 };
 
-// Mostrar personajes en cards
-const mostrarPersonajes = (personajes) => {
-  informacion.innerHTML = "";
-  if (!personajes || personajes.length === 0) {
-    informacion.innerHTML = "<p>No se encontraron personajes.</p>";
-    return;
-  }
-
-  personajes.forEach((p) => {
+// Mostrar cards
+const mostrarPersonajes = (lista) => {
+  lista.forEach((p) => {
     const col = document.createElement("div");
     col.className = "col-12 col-sm-6 col-md-4 col-lg-3";
     col.dataset.id = p.id;
@@ -42,72 +40,96 @@ const mostrarPersonajes = (personajes) => {
         </div>
       </div>
     `;
-
     informacion.appendChild(col);
   });
 };
 
-// Cargar todos los personajes al inicio
-const cargarTodos = async () => {
-  const data = await info(urlBase);
-  if (data && data.items) mostrarPersonajes(data.items);
-  else informacion.innerHTML = "<p>Error al cargar personajes.</p>";
+// Cargar personajes paginados
+const cargarPersonajes = async () => {
+  if (isLoading || !hasMore || isSearching) return;
+  isLoading = true;
+
+  const url = `${urlBase}?page=${currentPage}`;
+  const data = await fetchData(url);
+
+  if (data && data.items && data.items.length > 0) {
+    mostrarPersonajes(data.items);
+    currentPage++;
+  } else {
+    hasMore = false;
+  }
+
+  isLoading = false;
 };
 
-// Buscar personajes por nombre
+// Buscar por nombre
 const buscarPersonajes = async () => {
-  const query = inputBuscador.value.trim();
-  if (!query) {
-    cargarTodos();
+  const nombre = inputBuscador.value.trim();
+  informacion.innerHTML = "";
+  currentPage = 1;
+  hasMore = false;
+  isSearching = true;
+
+  if (!nombre) {
+    isSearching = false;
+    hasMore = true;
+    cargarPersonajes();
     return;
   }
-  const urlBusqueda = `${urlBase}/character/search?name=${encodeURIComponent(query)}`;
-  const resultado = await info(urlBusqueda);
-  if (resultado && resultado.length > 0) mostrarPersonajes(resultado);
-  else informacion.innerHTML = "<p>No se encontraron personajes con ese nombre.</p>";
+
+  const url = `${urlBase}/character/search?name=${encodeURIComponent(nombre)}`;
+  const data = await fetchData(url);
+
+  if (data && data.length > 0) {
+    mostrarPersonajes(data);
+  } else {
+    informacion.innerHTML = "<p>No se encontraron personajes.</p>";
+  }
+
+  isLoading = false;
 };
 
-// Mostrar detalle en modal con estilo card
+// Mostrar detalles en modal
 const verMas = async (id) => {
-  try {
-    const res = await fetch(`${urlBase}/${id}`);
-    if (!res.ok) throw new Error("Error al obtener detalles");
-    const data = await res.json();
+  const data = await fetchData(`${urlBase}/${id}`);
+  if (!data) return;
 
-    modalContenido.innerHTML = `
-      <div class="card mb-3">
-        <div class="row g-0">
-          <div class="col-md-4 text-center p-3">
-            <img src="${data.image}" class="img-fluid rounded" alt="${data.name}">
-          </div>
-          <div class="col-md-8">
-            <div class="card-body">
-              <h5 class="card-title">${data.name}</h5>
-              <p><strong>Raza:</strong> ${data.race}</p>
-              <p><strong>Género:</strong> ${data.gender}</p>
-              <p><strong>Descripción:</strong> ${data.description || "Sin descripción disponible"}</p>
-            </div>
+  modalContenido.innerHTML = `
+    <div class="card mb-3">
+      <div class="row g-0">
+        <div class="col-md-4 text-center p-3">
+          <img src="${data.image}" class="img-fluid rounded" alt="${data.name}">
+        </div>
+        <div class="col-md-8">
+          <div class="card-body">
+            <h5 class="card-title">${data.name}</h5>
+            <p><strong>Raza:</strong> ${data.race}</p>
+            <p><strong>Género:</strong> ${data.gender}</p>
+            <p><strong>Descripción:</strong> ${data.description || "Sin descripción disponible"}</p>
           </div>
         </div>
       </div>
-    `;
+    </div>
+  `;
 
-    modal.show();
-  } catch (error) {
-    console.log(error);
-    modalContenido.innerHTML = `<p class="text-danger">Error al cargar detalles.</p>`;
-    modal.show();
-  }
+  modal.show();
 };
 
-// Event listeners
-document.addEventListener("DOMContentLoaded", cargarTodos);
+// Scroll infinito
+window.addEventListener("scroll", () => {
+  const nearBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 300;
+  if (nearBottom) {
+    cargarPersonajes();
+  }
+});
+
+// Eventos
+document.addEventListener("DOMContentLoaded", cargarPersonajes);
 butBuscador.addEventListener("click", buscarPersonajes);
 
 informacion.addEventListener("click", (e) => {
   if (e.target.classList.contains("btn-ver-mas")) {
-    const cardPadre = e.target.closest("[data-id]");
-    const id = cardPadre?.dataset.id;
+    const id = e.target.closest("[data-id]").dataset.id;
     if (id) verMas(id);
   }
 });
