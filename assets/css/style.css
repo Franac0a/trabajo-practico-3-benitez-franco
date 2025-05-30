@@ -1,9 +1,29 @@
 body {
-    background-color: cadetblue;
-    /* background-image: url('/assets/img/kamehouse.jpg');
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
-    min-height: 100vh; 
-} */
+  background-color: #000000;
+}
+
+.card-img-top {
+  width: 100%;
+  height: 300px;
+  object-fit: contain;
+  background-color: #fff;
+  padding: 1rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.modal-body img {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 1rem;
 }
